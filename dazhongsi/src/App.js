@@ -7,21 +7,13 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
 var User={username:'',password:'',name:'',gender:'',age:0,idNumber:'',tel:'',address:'',note:''};
-var Userlogin={username:'',password:''};
 var enrollUser=axios.create({
-  url:"http://39.107.99.27:8080/dazhong/account/",
+  url:"http://39.107.99.27:8080/dazhong/account",
   headers:{"content-type":"application/json"},
   method:'post',
   data:User,
   timeout:1000,
 });
-var loginUser=axios.create({
-  url:"http://39.107.99.27:8080/dazhong/account/",
-  headers:{"content-type":"application/json"},
-  method:'get',
-  data:Userlogin,
-  timeout:1000,  
-})
 class Login extends React.Component{
   constructor(props){
     super(props);
@@ -42,19 +34,22 @@ class Login extends React.Component{
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        Userlogin.username=values.用户名;
-        Userlogin.password=values.密码;
-        console.log(Userlogin);
+        var urls="http://39.107.99.27:8080/dazhong/account?username="+values.用户名+"&password="+values.密码;
+        var loginUser=axios.create({
+          url:urls,
+          headers:{"content-type":"application/json"},
+          method:'get',
+          timeout:1000,  
+        })
         var that=this;
         loginUser().then(function(response){
-          if(response.result===1000){
+          if(response.data.result===1000){
             that.setState({visible:false});
-            message.success(response.resultDesp,3);
+            message.success(response.data.resultDesp,3);
           }
-          else if(response.result===4001){
-            message.error(response.resultDesp,3);
+          else if(response.data.result===4001){
+            message.error(response.data.resultDesp,3);
           }
-          console.log(response);
         })
         .catch(function(error){
           message.error('登录失败!',3);
@@ -203,17 +198,15 @@ class Register extends React.Component{
         if(typeof(User.note)=="undefined"||User.note==''){
           delete User.note;
         }
-        console.log(User);
         var that=this;
         enrollUser().then(function(response){
-          if(response.result===1000){
+          if(response.data.result===1000){
             that.setState({visible:false});
-            message.success(response.resultDesp,3);
+            message.success(response.data.resultDesp,3);
           }
-          else if(response.result===4002){
-            message.error(response.resultDesp,3);
+          else if(response.data.result===4002){
+            message.error(response.data.resultDesp,3);
           }
-          console.log(response);
         })
         .catch(function(error){
           message.error('用户创建失败!',3);
