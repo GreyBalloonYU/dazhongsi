@@ -19,6 +19,7 @@ class Login extends React.Component{
     super(props);
     this.state={
       visible:false,
+      redirect:false,
     }
   }
   
@@ -44,7 +45,8 @@ class Login extends React.Component{
         var that=this;
         loginUser().then(function(response){
           if(response.data.result===1000){
-            that.setState({visible:false});
+            localStorage.setItem("name",response.data.content["name"]);
+            that.setState({visible:false,redirect:true});
             message.success(response.data.resultDesp,3);
           }
           else if(response.data.result===4001){
@@ -83,6 +85,9 @@ class Login extends React.Component{
         },
       },
     };
+    if(this.state.redirect){
+      return <Redirect exact push to="/center/checkin"/>
+    }
     return(
        <div>
           <Button type="primary" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>登录</Button>
