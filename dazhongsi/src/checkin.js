@@ -19,10 +19,10 @@ class CheckInTag extends React.Component{
     render(){
         return(
             <div>
-             <span style={{ marginLeft:"20px",marginRight:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
+             <span style={{ marginLeft:"1.25em",marginRight:"1.25em",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
              {this.props.text}
              </span>
-             <Tag color={this.state.color} style={{marginRight:"20px"}}>{this.state.content}</Tag>
+             <Tag color={this.state.color} style={{marginRight:"1.25em"}}>{this.state.content}</Tag>
              <Button onClick={this.handleCheckin} disabled={this.state.content=="未签到"?false:true}>签到</Button>
             </div>
         )

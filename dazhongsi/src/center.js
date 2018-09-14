@@ -71,14 +71,14 @@ class Center extends React.Component{
                     mode="horizontal"
                     defaultSelectedKeys={['1']}
                     selectedKeys={[String(this.state.key)]}
-                    style={{ lineHeight: '64px' }}
+                    style={{ lineHeight: '4.6em' }}
                     onClick={this.changehref}
                   >
                   <Menu.Item key="1">我的</Menu.Item>
                   <Menu.Item key="2">排班表</Menu.Item>
                   </Menu>
                 </Header>
-                <Content style={{ padding: '0 50px', marginTop: 64 }}>
+                <Content style={{ padding: '0 3.125em', marginTop: 64 }}>
                    <Switch>
                      <Route exact path="/center/checkin" component={Checkin}/>
                      <Route exact path="/center/arrange" component={Arrange}/>
