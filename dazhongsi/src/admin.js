@@ -5,10 +5,11 @@ import {Layout,Menu,message} from 'antd';
 import {Switch,Route,Redirect}from 'react-router-dom';
 import axios from "axios";
 import Checkin from './checkin.js';
-import Arrange from './arrange.js';
+import WrappedArrange from './arrange.js';
 const { Header, Content, Footer } = Layout;
+var user={accountId:"",address:"",age:"",gender:"",id:"",idNumber:"",name:"",note:"",tel:""};
 
-class Center extends React.Component{
+class Admin extends React.Component{
     constructor(props){
         super(props);
         this.state={
@@ -20,10 +21,10 @@ class Center extends React.Component{
     }
 
     componentWillMount(){
-        if(window.location.pathname==='/center/checkin'){
+        if(window.location.pathname==='/admin/checkin'){
           this.setState({norepeatkey1:false})
         }
-        if(window.location.pathname==='/center/arrange'){
+        if(window.location.pathname==='/admin/arrange'){
           this.setState({norepeatkey2:false})
         }
     }
@@ -34,13 +35,25 @@ class Center extends React.Component{
             headers:{"content-type":"application/json"},
             method:'get',
             timeout:1000,
+            withCredentials:true,
         })
-        getuserinformation().then(function(response){
-            console.log(response);
-        })
-        .catch(function(error){
+        var that=this;
+          getuserinformation().then(function(response){
+            that.setState({
+                accountId:response.data.content[0].accountId,
+                address:response.data.content[0].address,
+                age:response.data.content[0].age,
+                gender:response.data.content[0].gender,
+                id:response.data.content[0]["id"],
+                idNumber:response.data.content[0].idNumber,
+                name:response.data.content[0]["name"],
+                note:response.data.content[0].note,
+                tel:response.data.content[0].tel,
+            });
+          })
+          .catch(function(error){
             console.log(error);
-        })
+          })
     }
 
     componentDidUpdate(){
@@ -58,11 +71,20 @@ class Center extends React.Component{
 
     render(){
         if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
-           return (<Redirect exact push to='/center/checkin'/>);
+           return (<Redirect exact push to='/admin/checkin'/>);
         }
         if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
-           return (<Redirect exact push to='/center/arrange'/>);
+           return (<Redirect exact push to='/admin/arrange'/>);
         }
+        user.accountId=this.state.accountId;
+        user.address=this.state.address;
+        user.age=this.state.age;
+        user.gender=this.state.gender;
+        user["id"]=this.state["id"];
+        user.idNumber=this.state.idNumber;
+        user["name"]=this.state["name"];
+        user.note=this.state.note;
+        user.tel=this.state.tel;
         return(
             <Layout>
                 <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
@@ -80,8 +102,10 @@ class Center extends React.Component{
                 </Header>
                 <Content style={{ padding: '0 3.125em', marginTop: 64 }}>
                    <Switch>
-                     <Route exact path="/center/checkin" component={Checkin}/>
-                     <Route exact path="/center/arrange" component={Arrange}/>
+                     <Route exact path='/admin/checkin' render={(props)=>(
+                      <Checkin {...props} user={user}/> 
+                     )}/>
+                     <Route exact path="/admin/arrange" component={WrappedArrange}/>
                    </Switch>
                 </Content>
             </Layout>
@@ -89,4 +113,4 @@ class Center extends React.Component{
     }
 }
 
-export default Center;
+export default Admin;

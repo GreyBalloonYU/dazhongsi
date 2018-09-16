@@ -1,9 +1,44 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import {Row,Col,Button,List,Tag} from 'antd';
+import {Row,Col,Button,List,Tag,message,Modal,Form,DatePicker,Input} from 'antd';
+import axios from 'axios';
+import moment from 'moment';
+const FormItem = Form.Item;
+
+function disabledDate(current) {
+  // Can not select days before today and today
+  return current && current < moment().endOf('day');
+}
 
 class Arrange extends React.Component{
+    constructor(props){
+      super(props);
+      this.state={
+        visible1:false,
+        visible2:false,
+        visible3:false,
+      }
+    }
+
+    showModal3=()=>{
+      this.setState({visible3:true});
+    }
+
+    handleCancel3=()=>{
+      this.setState({visible3:false});
+    }
+
+    handleSubmit=(e)=>{
+      e.preventDefault();
+      this.props.form.validateFieldsAndScroll(["志愿者姓名","排班时间"],(err,values)=>{
+        if(!err){
+           console.log(values);
+           this.setState({visible3:false});
+        }
+      })
+    }
+
     render(){
         const data=[
             '2018.9.10 17 : 00 - 19 : 30',
@@ -18,6 +53,32 @@ class Arrange extends React.Component{
              key:i
           })
         }
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+          labelCol: {
+            xs: { span: 24 },
+            sm: { span: 8 },
+          },
+          wrapperCol: {
+            xs: { span: 24 },
+            sm: { span: 16 },
+          },
+        };
+        const tailFormItemLayout = {
+          wrapperCol: {
+            xs: {
+              span: 24,
+              offset: 0,
+            },
+            sm: {
+              span: 16,
+              offset: 8,
+            },
+          },
+        };
+        const dateConfig = {
+          rules: [{ type: 'object', required: true, message: '请选择时间!' }],
+        };
         return(
             <div>
                <Row>
@@ -74,16 +135,50 @@ class Arrange extends React.Component{
                <br/><br/><br/>
                <Row>
                  <Col xs={24} sm={{span:12,offset:10}}>
-                   <Button type="primary" style={{width:"200px",height:"80px"}}>
+                   <Button type="primary" style={{width:"200px",height:"80px"}} onClick={this.showModal3}>
                    <span style={{fontSize:"30px",letterSpacing:"5px"}}>
                    添加排班
                    </span>
                    </Button>
                  </Col>
                </Row>
-               <br/><br/><br/>
+               <Modal
+                 title="添加排班"
+                 visible={this.state.visible3}
+                 footer={null}
+                 onCancel={this.handleCancel3}
+                 destroyOnClose={true}
+               >
+                <Form onSubmit={this.handleSubmit}>
+                  <FormItem
+                    {...formItemLayout}
+                    label="志愿者姓名"
+                  >
+                  {getFieldDecorator('志愿者姓名', {
+                    rules: [{
+                     required: true, message: '请输入志愿者姓名!',whitespace:true
+                   }],
+                   })(
+                   <Input />
+                  )}
+                  </FormItem>
+                  <FormItem
+                    {...formItemLayout}
+                    label="排班时间"
+                  >
+                   {getFieldDecorator('开课时间', dateConfig)(
+                    <DatePicker disabledDate={disabledDate}/>
+                   )}
+                  </FormItem>
+                  <FormItem {...tailFormItemLayout}>
+                    <Button type="primary" htmlType="submit">添加</Button>
+                  </FormItem>
+               </Form> 
+               </Modal>
+               <br/><br/><br/>            
             </div>
         )
     }
 }
-export default Arrange;
+const WrappedArrange = Form.create()(Arrange);
+export default WrappedArrange;

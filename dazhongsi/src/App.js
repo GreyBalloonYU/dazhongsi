@@ -13,6 +13,7 @@ var enrollUser=axios.create({
   method:'post',
   data:User,
   timeout:1000,
+  withCredentials:true,
 });
 class Login extends React.Component{
   constructor(props){
@@ -40,12 +41,14 @@ class Login extends React.Component{
           url:urls,
           headers:{"content-type":"application/json"},
           method:'get',
-          timeout:1000,  
+          timeout:1000,
+          withCredentials:true,
         })
         var that=this;
         loginUser().then(function(response){
           if(response.data.result===1000){
             localStorage.setItem("name",response.data.content["name"]);
+            localStorage.setItem("role",response.data.content["role"]);
             that.setState({visible:false,redirect:true});
             message.success(response.data.resultDesp,3);
           }
@@ -85,8 +88,10 @@ class Login extends React.Component{
         },
       },
     };
+    //return <Redirect exact push to="/center/checkin"/>
     if(this.state.redirect){
-      return <Redirect exact push to="/center/checkin"/>
+      if(localStorage.getItem("role")==="管理员")return <Redirect exact push to="/admin/checkin"/>
+      else return <Redirect exact push to="/volunteer"/>
     }
     return(
        <div>

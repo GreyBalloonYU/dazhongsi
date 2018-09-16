@@ -30,15 +30,26 @@ class CheckInTag extends React.Component{
 }
 
 class Checkin extends React.Component{
+    componentDidMount(){
+    //    var getSchedule=axios.create({
+    //        url:"http://39.107.99.27:8080/dazhong/user/name?name="+localStorage.getItem("name"),
+    //        headers:{"content-type":"application/json"},
+    //        method:'get',
+    //        timeout:1000,
+    //        withCredentials:true,
+     //   })
+    }
+
     render(){
+        console.log(this.props.user)
         return(
             <div>
               <Row>
                 <Col xs={24} sm={{span:6,offset:6}}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   用户名
+                   姓名
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
+                   {this.props.user["name"]!==""?this.props.user["name"]:"null"}
                    </span>
                    </div>
                 </Col>
@@ -46,30 +57,9 @@ class Checkin extends React.Component{
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
                    身份证号
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
+                   {this.props.user.idNumber!==""?this.props.user.idNumber:"null"}
                    </span>
                    </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col xs={24} sm={{span:6,offset:6}}>
-                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   姓名
-                   <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
-                   </span>
-                   </div>
-                </Col>
-                <Col xs={24} sm={6}>
-                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   电话
-                   <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
-                   </span>
-                   </div>
-                </Col>
-                <Col xs={24} sm={6}>
-                  <Button type="primary">修改用户信息</Button>
                 </Col>
               </Row>
               <Row>
@@ -77,15 +67,28 @@ class Checkin extends React.Component{
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
                    年龄
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
+                   {this.props.user.age!==""?this.props.user.age:"null"}
                    </span>
                    </div>
                 </Col>
                 <Col xs={24} sm={6}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
+                   电话
+                   <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
+                   {this.props.user.tel!==""?this.props.user.tel:"null"}
+                   </span>
+                   </div>
+                </Col>
+                <Col xs={24} sm={{span:4,offset:2}}>
+                  <Button type="primary">修改用户信息</Button>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={24} sm={{span:6,offset:6}}>
+                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
                    地址
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
+                   {this.props.user.address!==""?this.props.user.address:"null"}
                    </span>
                    </div>
                 </Col>
@@ -95,7 +98,7 @@ class Checkin extends React.Component{
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
                    备注
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   null
+                   {this.props.user.note!==""?this.props.user.note:"null"}
                    </span>
                    </div>
                 </Col>
