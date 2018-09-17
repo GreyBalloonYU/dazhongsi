@@ -5,7 +5,7 @@ import {Layout,Menu,message} from 'antd';
 import {Switch,Route,Redirect}from 'react-router-dom';
 import axios from "axios";
 import Checkin from './checkin.js';
-import WrappedArrange from './arrange.js';
+import Arrange from './arrange.js';
 const { Header, Content, Footer } = Layout;
 var user={accountId:"",address:"",age:"",gender:"",id:"",idNumber:"",name:"",note:"",tel:""};
 
@@ -105,7 +105,7 @@ class Admin extends React.Component{
                      <Route exact path='/admin/checkin' render={(props)=>(
                       <Checkin {...props} user={user}/> 
                      )}/>
-                     <Route exact path="/admin/arrange" component={WrappedArrange}/>
+                     <Route exact path="/admin/arrange" component={Arrange}/>
                    </Switch>
                 </Content>
             </Layout>

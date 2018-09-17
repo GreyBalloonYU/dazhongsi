@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import {Row,Col,Button,Tag} from 'antd';
+import {Row,Col,Button,Tag,message} from 'antd';
+import axios from 'axios';
+import moment from 'moment';
 
 class CheckInTag extends React.Component{
     constructor(props){
@@ -13,6 +15,22 @@ class CheckInTag extends React.Component{
     }
 
     handleCheckin=()=>{
+        var checkin=axios.create({
+            url:"http://39.107.99.27:8080/dazhong/checkIn",
+            headers:{"content-type":"application/json"},
+            method:'post',
+            data:{scheduleId:this.props.scheduleId},
+            timeout:1000,
+            withCredentials:true,
+        });
+        checkin().then(function(response){
+            if(response.data.result===1000)message.success(response.data.resultDesp,3);
+            else if(response.data.result===4007)message.error(response.data.resultDesp,3);
+        })
+        .catch(function(error){
+           console.log(error);
+           message.error("签到失败",3);
+        })
         this.setState({content:"已签到",color:"green"});
     }
 
@@ -30,18 +48,37 @@ class CheckInTag extends React.Component{
 }
 
 class Checkin extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={
+            checkInRow:[],//存有今日签到的数组列表，每一个元素均为CheckInTag
+        }
+    }
+
     componentDidMount(){
-    //    var getSchedule=axios.create({
-    //        url:"http://39.107.99.27:8080/dazhong/user/name?name="+localStorage.getItem("name"),
-    //        headers:{"content-type":"application/json"},
-    //        method:'get',
-    //        timeout:1000,
-    //        withCredentials:true,
-     //   })
+        var that=this;
+        var getSchedule=axios.create({
+            url:"http://39.107.99.27:8080/dazhong/schedule?name="+localStorage.getItem("name")+"&start="+moment().valueOf()+"&end="+moment().add(1,"days").valueOf(),
+            headers:{"content-type":"application/json"},
+            method:'get',
+            timeout:1000,
+            withCredentials:true,
+        })
+        getSchedule().then(function(response){
+            var checkInRow2=[];
+            for(var i=0;i<response.data.content.length;i++){
+                checkInRow2.push(
+                    <CheckInTag key={i} text={response.data.content[i].scheduleTime} isCheckIn={response.data.content[i].isCheckIn} scheduleId={response.data.content[i]["id"]}/>
+                )
+            }
+            that.setState({checkInRow:checkInRow2});
+        })
+        .catch(function(error){
+            console.log(error);
+        })
     }
 
     render(){
-        console.log(this.props.user)
         return(
             <div>
               <Row>
@@ -107,10 +144,7 @@ class Checkin extends React.Component{
                 <Col xs={24} sm={{span:12,offset:6}}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
                    今日签到
-                   <CheckInTag text="今天14 : 30至16 : 30" isCheckIn={1}/>
-                   <CheckInTag text="今天13 : 30至14 : 30" isCheckIn={0}/>
-                   <CheckInTag text="今天7 : 30至9 : 30" isCheckIn={1}/>
-                   <CheckInTag text="今天6 : 30至7 : 30" isCheckIn={0}/>
+                   {this.state.checkInRow}
                    </div>
                 </Col>
               </Row>
