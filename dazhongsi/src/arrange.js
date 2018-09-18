@@ -275,19 +275,49 @@ class ManageSchedule extends React.Component{
        }
     }
 
-    componentDidMount(){
+    showModal=()=>{
+      this.setState({visible:true});
+    }
+  
+    handleCancel=()=>{
+      this.setState({visible:false});
+    }
 
+    componentDidMount(){
+      var that=this;
+      var getSchedule=axios.create({
+          url:"http://39.107.99.27:8080/dazhong/schedule?start="+moment().subtract(1,"months").valueOf()+"&end="+moment().add(1,"months").valueOf(),
+          headers:{"content-type":"application/json"},
+          method:'get',
+          timeout:1000,
+          withCredentials:true,
+      })
+      getSchedule().then(function(response){
+          var dataRow2=[];
+          for(var i=0;i<response.data.content.length;i++){
+              for(var j=0;j<response.data.content.length-i-1;j++){
+                  if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                      var temp=response.data.content[j];
+                      response.data.content[j]=response.data.content[j+1];
+                      response.data.content[j+1]=temp;
+                  }
+              }
+          }
+          for(var i=0;i<response.data.content.length;i++){
+              dataRow2.push(
+                  {checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
+                  time:response.data.content[i].scheduleTime,
+                  name:response.data.content[i].name}
+              )
+          }
+          that.setState({dataRow:dataRow2});
+      })
+      .catch(function(error){
+          console.log(error);
+      })   
     }
 
     render(){
-      const data1=[];
-      for(var i=0;i<4;i++){
-        data1.push({
-           content:"2018.9.10 17 : 00 -19 : 30     李四",
-           checkin:"未签到",
-           key:i
-        })
-      }
       return(
         <div>
           <Row>
@@ -297,13 +327,16 @@ class ManageSchedule extends React.Component{
               <List
                 bordered
                 itemLayout="vertical"
-                dataSource={this.state.dataRow}
+                dataSource={_.first(this.state.dataRow,4)}
                 renderItem={item => (
                 <List.Item
                     key={item.title}
                     extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                 >
-                {item.content}
+                <span style={{fontSize:"1.5em"}}>
+                <span style={{marginRight:"1em"}}>{item.time}</span>
+                {item["name"]}
+                </span>
                  </List.Item>
                 )}
                 size="large"
@@ -314,9 +347,34 @@ class ManageSchedule extends React.Component{
           <br/>
           <Row>
             <Col xs={24} sm={{span:12,offset:6}}>
-              <Button type="primary">管理最近两个月的排班表</Button>
+              <Button type="primary" onClick={this.showModal}>管理最近两个月的排班表</Button>
             </Col>
           </Row>
+          <Modal
+           title="我未来一周的排班表"
+           visible={this.state.visible}
+           footer={null}
+           maskClosable={false}
+           onCancel={this.handleCancel}
+          > 
+              <List
+                bordered
+                itemLayout="vertical"
+                dataSource={this.state.dataRow}
+                renderItem={item => (
+                <List.Item
+                    key={item.title}
+                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                >
+                <span style={{fontSize:"1.5em"}}>
+                <span style={{marginRight:"1em"}}>{item.time}</span>
+                {item["name"]}
+                </span>
+                 </List.Item>
+                )}
+                size="large"
+              />
+          </Modal> 
         </div>
       )
     }
