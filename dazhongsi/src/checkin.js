@@ -4,6 +4,7 @@ import './App.css';
 import {Row,Col,Button,Tag,message} from 'antd';
 import axios from 'axios';
 import moment from 'moment';
+import {_} from 'underscore';
 
 class CheckInTag extends React.Component{
     constructor(props){
@@ -66,6 +67,15 @@ class Checkin extends React.Component{
         })
         getSchedule().then(function(response){
             var checkInRow2=[];
+            for(var i=0;i<response.data.content.length;i++){
+                for(var j=0;j<response.data.content.length-i-1;j++){
+                    if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                        var temp=response.data.content[j];
+                        response.data.content[j]=response.data.content[j+1];
+                        response.data.content[j+1]=temp;
+                    }
+                }
+            }
             for(var i=0;i<response.data.content.length;i++){
                 checkInRow2.push(
                     <CheckInTag key={i} text={response.data.content[i].scheduleTime} isCheckIn={response.data.content[i].isCheckIn} scheduleId={response.data.content[i]["id"]}/>
@@ -143,8 +153,14 @@ class Checkin extends React.Component{
               <Row>
                 <Col xs={24} sm={{span:12,offset:6}}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   今日签到
-                   {this.state.checkInRow}
+                   今日签到(显示距离当前时间最近的一个排班):
+                   </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={24} sm={{span:12,offset:6}}>
+                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
+                   {_.first(this.state.checkInRow)}
                    </div>
                 </Col>
               </Row>
