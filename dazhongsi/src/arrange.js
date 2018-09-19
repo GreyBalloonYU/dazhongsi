@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
 import {Row,Col,Button,List,Tag,message,Modal,Form,DatePicker,Input} from 'antd';
+import {Link}from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment';
 import {_} from 'underscore';
@@ -55,6 +56,7 @@ class AddSchedule extends React.Component{
           addSchedule().then(function(response2){
             if(response2.data.result===1000){
               message.success(response2.data.resultDesp,3);
+              that.props.handleAction();
               that.setState({visible:false});
             }
             else if(response2.data.result===4006)message.error(response2.data.resultDesp,3);
@@ -205,6 +207,41 @@ class InquireSelfCheckIn extends React.Component{
       })     
     }
 
+    componentWillReceiveProps(nextProps){
+      if(nextProps.isAction){
+        var that=this;
+        var getSchedule=axios.create({
+            url:"http://39.107.99.27:8080/dazhong/schedule?name="+localStorage.getItem("name")+"&start="+moment().valueOf()+"&end="+moment().add(7,"days").valueOf(),
+            headers:{"content-type":"application/json"},
+            method:'get',
+            timeout:1000,
+            withCredentials:true,
+        })
+        getSchedule().then(function(response){
+            var dataRow2=[];
+            for(var i=0;i<response.data.content.length;i++){
+                for(var j=0;j<response.data.content.length-i-1;j++){
+                    if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                        var temp=response.data.content[j];
+                        response.data.content[j]=response.data.content[j+1];
+                        response.data.content[j+1]=temp;
+                    }
+                }
+            }
+            for(var i=0;i<response.data.content.length;i++){
+                dataRow2.push(
+                    {checkin:response.data.content[i].isCheckIn?"已签到":"未签到",content:response.data.content[i].scheduleTime}
+                )
+            }
+            that.setState({dataRow:dataRow2});
+        })
+        .catch(function(error){
+            console.log(error);
+        })  
+        this.props.handleEndAction();       
+      }
+    }
+
     render(){
       return(
         <div>
@@ -267,23 +304,61 @@ class InquireSelfCheckIn extends React.Component{
 }
 
 class ManageSchedule extends React.Component{
-    constructor(props){
-       super(props);
-       this.state={
-         visible:false,
-         dataRow:[],//存有所有志愿者在最近两个月之内排班的数据(之前一个月加未来一个月)
-       }
-    }
+  constructor(props){
+     super(props);
+     this.state={
+       visible:false,
+       listRow:[],//存有所有志愿者在最近两个月之内排班的数据(之前一个月加未来一个月)
+     }
+  }
 
-    showModal=()=>{
-      this.setState({visible:true});
-    }
-  
-    handleCancel=()=>{
-      this.setState({visible:false});
-    }
+  showModal=()=>{
+    this.setState({visible:true});
+  }
 
-    componentDidMount(){
+  handleCancel=()=>{
+    this.setState({visible:false});
+  }
+
+  componentDidMount(){
+    var that=this;
+    var getSchedule=axios.create({
+        url:"http://39.107.99.27:8080/dazhong/schedule?start="+moment().subtract(1,"months").valueOf()+"&end="+moment().add(1,"months").valueOf(),
+        headers:{"content-type":"application/json"},
+        method:'get',
+        timeout:1000,
+        withCredentials:true,
+    })
+    getSchedule().then(function(response){
+        var dataRow=[];
+        for(var i=0;i<response.data.content.length;i++){
+            for(var j=0;j<response.data.content.length-i-1;j++){
+                if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                    var temp=response.data.content[j];
+                    response.data.content[j]=response.data.content[j+1];
+                    response.data.content[j+1]=temp;
+                }
+            }
+        }
+        for(var i=0;i<response.data.content.length;i++){
+            dataRow.push(
+                {
+                 checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
+                 time:response.data.content[i].scheduleTime,
+                 name:response.data.content[i].name,
+                 scheduleId:response.data.content[i]["id"],
+                }
+            )
+        }
+        that.setState({listRow:dataRow});
+    })
+    .catch(function(error){
+        console.log(error);
+    })   
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.isAction){
       var that=this;
       var getSchedule=axios.create({
           url:"http://39.107.99.27:8080/dazhong/schedule?start="+moment().subtract(1,"months").valueOf()+"&end="+moment().add(1,"months").valueOf(),
@@ -293,7 +368,7 @@ class ManageSchedule extends React.Component{
           withCredentials:true,
       })
       getSchedule().then(function(response){
-          var dataRow2=[];
+          var dataRow=[];
           for(var i=0;i<response.data.content.length;i++){
               for(var j=0;j<response.data.content.length-i-1;j++){
                   if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
@@ -304,92 +379,120 @@ class ManageSchedule extends React.Component{
               }
           }
           for(var i=0;i<response.data.content.length;i++){
-              dataRow2.push(
-                  {checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
-                  time:response.data.content[i].scheduleTime,
-                  name:response.data.content[i].name}
+              dataRow.push(
+                {
+                 checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
+                 time:response.data.content[i].scheduleTime,
+                 name:response.data.content[i].name,
+                 scheduleId:response.data.content[i]["id"],
+                }
               )
           }
-          that.setState({dataRow:dataRow2});
+          that.setState({listRow:dataRow});
       })
       .catch(function(error){
           console.log(error);
-      })   
+      })
+      this.props.handleEndAction();    
     }
+  }
 
-    render(){
-      return(
-        <div>
-          <Row>
-            <Col xs={24} sm={{span:12,offset:6}}>
-              <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-              排班表管理
-              <List
-                bordered
-                itemLayout="vertical"
-                dataSource={_.first(this.state.dataRow,4)}
-                renderItem={item => (
+  render(){
+    return(
+      <div>
+        <Row>
+          <Col xs={24} sm={{span:12,offset:6}}>
+            <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
+            排班表管理
+            <List
+              bordered
+              itemLayout="vertical"
+              dataSource={_.first(this.state.listRow,4)}
+              renderItem={item => (
                 <List.Item
-                    key={item.title}
-                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                key={item.title}
+                extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                actions={[
+                  <span>{item.checkin=="已签到"?<span style={{marginLeft:"1em",marginRight:"1em"}}><Link to={"/deleteCheckIn"+item.scheduleId}>删除签到记录</Link></span>:<span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
+                  <Link to="/deleteSchedule">删除排班</Link>
+                ]}
                 >
-                <span style={{fontSize:"1.5em"}}>
-                <span style={{marginRight:"1em"}}>{item.time}</span>
-                {item["name"]}
-                </span>
-                 </List.Item>
-                )}
-                size="large"
-              />
-              </div>
-            </Col>
-          </Row>
-          <br/>
-          <Row>
-            <Col xs={24} sm={{span:12,offset:6}}>
-              <Button type="primary" onClick={this.showModal}>管理最近两个月的排班表</Button>
-            </Col>
-          </Row>
-          <Modal
-           title="我未来一周的排班表"
-           visible={this.state.visible}
-           footer={null}
-           maskClosable={false}
-           onCancel={this.handleCancel}
-          > 
-              <List
-                bordered
-                itemLayout="vertical"
-                dataSource={this.state.dataRow}
-                renderItem={item => (
+              <span style={{fontSize:"1.5em"}}>
+              <span style={{marginRight:"1em"}}>{item.time}</span>
+              {item["name"]}
+              </span>
+               </List.Item>
+              )}
+              size="large"
+            />
+            </div>
+          </Col>
+        </Row>
+        <br/>
+        <Row>
+          <Col xs={24} sm={{span:12,offset:6}}>
+            <Button type="primary" onClick={this.showModal}>管理最近两个月的排班表</Button>
+          </Col>
+        </Row>
+        <Modal
+         title="管理最近两个月的排班表"
+         visible={this.state.visible}
+         footer={null}
+         maskClosable={false}
+         onCancel={this.handleCancel}
+         width={900}
+        > 
+            <List
+              bordered
+              itemLayout="vertical"
+              dataSource={this.state.listRow}
+              renderItem={item => (
                 <List.Item
-                    key={item.title}
-                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                key={item.title}
+                extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                actions={[
+                  <span>{item.checkin=="已签到"?<span style={{marginLeft:"1em",marginRight:"1em"}}><Link to={"/deleteCheckIn"+item.scheduleId}>删除签到记录</Link></span>:<span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
+                  <Link to="/deleteSchedule">删除排班</Link>
+                ]}
                 >
-                <span style={{fontSize:"1.5em"}}>
-                <span style={{marginRight:"1em"}}>{item.time}</span>
-                {item["name"]}
-                </span>
-                 </List.Item>
-                )}
-                size="large"
-              />
-          </Modal> 
-        </div>
-      )
-    }
+              <span style={{fontSize:"1.5em"}}>
+              <span style={{marginRight:"1em"}}>{item.time}</span>
+              {item["name"]}
+              </span>
+               </List.Item>
+              )}
+              size="large"
+            />
+        </Modal> 
+      </div>
+    )
+  }
 }
 
 class Arrange extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={
+      isAction:false,//是否执行了添加排班、删除排班、删除签到的操作
+    }
+  }
+
+  handleAction=()=>{
+    this.setState({isAction:true});
+  }
+
+  handleEndAction=()=>{
+    this.setState({isAction:false});
+  }
 
     render(){
         return(
             <div>
-               <InquireSelfCheckIn/>
+               <InquireSelfCheckIn isAction={this.state.isAction} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
                <br/><br/>
-               <ManageSchedule/>
+               <ManageSchedule isAction={this.state.isAddSchedule} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
                <br/><br/><br/>
-               <WrappedAddSchedule/>
+               <WrappedAddSchedule handleAction={this.handleAction}/>
                <br/><br/><br/>            
             </div>
         )
