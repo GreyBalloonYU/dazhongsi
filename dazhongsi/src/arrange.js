@@ -7,6 +7,7 @@ import axios from 'axios';
 import moment from 'moment';
 import {_} from 'underscore';
 const FormItem = Form.Item;
+const Search=Input.Search;
 
 function disabledDate(current) {
   // Can not select days before today
@@ -447,6 +448,16 @@ class ManageSchedule extends React.Component{
          onCancel={this.handleCancel}
          width={900}
         > 
+          <Row>
+            <Col xs={24} sm={6}>
+            <Search
+                placeholder="input search text"
+                enterButton
+                size="large"
+             />
+            </Col>
+          </Row>
+          <br/><br/>
             <List
               bordered
               itemLayout="vertical"
