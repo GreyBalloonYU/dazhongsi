@@ -310,6 +310,8 @@ class ManageSchedule extends React.Component{
      this.state={
        visible:false,
        listRow:[],//存有所有志愿者在最近两个月之内排班的数据(之前一个月加未来一个月) 
+       isSearch:false,//是否在搜索框搜索了志愿者姓名
+       volunteerName:""//搜索的志愿者的姓名
      }
   }
 
@@ -318,7 +320,7 @@ class ManageSchedule extends React.Component{
   }
 
   handleCancel=()=>{
-    this.setState({visible:false});
+    this.setState({visible:false,isSearch:false});
   }
 
   componentDidMount(){
@@ -398,7 +400,12 @@ class ManageSchedule extends React.Component{
     }
   }
 
+  handleSearch=(value,event)=>{
+    this.setState({volunteerName:value,isSearch:true});
+  }
+
   render(){
+    var that=this;
     return(
       <div>
         <Row>
@@ -449,11 +456,12 @@ class ManageSchedule extends React.Component{
          width={900}
         > 
           <Row>
-            <Col xs={24} sm={6}>
+            <Col xs={24} sm={8}>
             <Search
-                placeholder="input search text"
+                placeholder="搜索志愿者姓名,查询排班表"
                 enterButton
                 size="large"
+                onSearch={this.handleSearch}
              />
             </Col>
           </Row>
@@ -461,7 +469,7 @@ class ManageSchedule extends React.Component{
             <List
               bordered
               itemLayout="vertical"
-              dataSource={this.state.listRow}
+              dataSource={this.state.isSearch?_.filter(that.state.listRow,function(list){ return list["name"]===that.state.volunteerName}):this.state.listRow}
               renderItem={item => (
                 <List.Item
                 key={item.title}

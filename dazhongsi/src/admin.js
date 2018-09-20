@@ -4,7 +4,7 @@ import './App.css';
 import {Layout,Menu,message} from 'antd';
 import {Switch,Route,Redirect}from 'react-router-dom';
 import axios from "axios";
-import Checkin from './checkin.js';
+import WrappedCheckin from './checkin.js';
 import Arrange from './arrange.js';
 import DeleteCheckIn from './deleteCheckIn.js'
 import DeleteSchedule from './deleteSchedule.js'
@@ -105,7 +105,7 @@ class Admin extends React.Component{
                 <Content style={{ padding: '0 3.125em', marginTop: 64 }}>
                    <Switch>
                      <Route exact path='/admin/checkin' render={(props)=>(
-                      <Checkin {...props} user={user}/> 
+                      <WrappedCheckin {...props} user={user}/> 
                      )}/>
                      <Route exact path='/admin/arrange' render={(props)=>(
                       <Arrange {...props} changeDelete={this.changeDelete}/> 

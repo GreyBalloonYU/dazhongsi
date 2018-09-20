@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import {Row,Col,Button,Tag,message} from 'antd';
+import {Row,Col,Button,Tag,message,Form,InputNumber,Input,Modal} from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 import {_} from 'underscore';
+const FormItem = Form.Item;
 
 class CheckInTag extends React.Component{
     constructor(props){
@@ -48,12 +49,22 @@ class CheckInTag extends React.Component{
     }
 }
 
+
 class Checkin extends React.Component{
     constructor(props){
         super(props);
         this.state={
             checkInRow:[],//存有今日签到的数组列表，每一个元素均为CheckInTag
+            visible:false,
         }
+    }
+
+    showModal=()=>{
+        this.setState({visible:true});
+    }
+
+    handleCancel=()=>{
+        this.setState({visible:false});
     }
 
     componentDidMount(){
@@ -89,6 +100,32 @@ class Checkin extends React.Component{
     }
 
     render(){
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+          labelCol: {
+            xs: { span: 24 },
+            sm: { span: 8 },
+          },
+          wrapperCol: {
+            xs: { span: 24 },
+            sm: { span: 16 },
+          },
+        };
+        const tailFormItemLayout = {
+          wrapperCol: {
+            xs: {
+              span: 24,
+              offset: 0,
+            },
+            sm: {
+              span: 16,
+              offset: 8,
+            },
+          },
+        };
+        const tips=(
+            <p style={{fontSize:"20px"}}>除了密码必须填之外，其他信息可以有选择性的填</p>
+        )
         return(
             <div>
               <Row>
@@ -127,7 +164,7 @@ class Checkin extends React.Component{
                    </div>
                 </Col>
                 <Col xs={24} sm={{span:4,offset:2}}>
-                  <Button type="primary">修改用户信息</Button>
+                  <Button type="primary" onClick={this.showModal}>修改用户信息</Button>
                 </Col>
               </Row>
               <Row>
@@ -165,8 +202,127 @@ class Checkin extends React.Component{
                 </Col>
               </Row>
               <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+              <Modal
+               title="修改用户信息"
+               visible={this.state.visible}
+               footer={null}
+               onCancel={this.handleCancel}
+               destroyOnClose={true}
+               width={600}
+              >
+                <Form onSubmit={this.handleSubmit}>
+                <FormItem
+                  {...formItemLayout}
+                   label="用户名"
+                >
+                 {getFieldDecorator('用户名', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                   label="姓名"
+                >
+                 {getFieldDecorator('姓名', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                   label="密码"
+                >
+                 {getFieldDecorator('密码', {
+                  rules: [{
+                    required: true, message: '请输入你的密码!',whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                   label="年龄"
+                >
+                 {getFieldDecorator('年龄', {
+                   rules: [{
+                     whitespace:true,type:"number"
+                   }],
+                  })(
+                    <InputNumber min={1} max={99}/>
+                 )}
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                   label="身份证号"
+                >
+                 {getFieldDecorator('身份证号', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>  
+                <FormItem
+                  {...formItemLayout}
+                   label="电话"
+                >
+                 {getFieldDecorator('电话', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>  
+                <FormItem
+                  {...formItemLayout}
+                   label="地址"
+                >
+                 {getFieldDecorator('地址', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem> 
+                <FormItem
+                  {...formItemLayout}
+                   label="备注"
+                >
+                 {getFieldDecorator('备注', {
+                  rules: [{
+                    whitespace:true
+                  }],
+                  })(
+                     <Input />
+                 )}
+                </FormItem>
+                <FormItem
+                 wrapperCol={{
+                   xs: { span: 24, offset: 0 },
+                   sm: { span: 16, offset: 8 },
+                 }}
+                 help={tips}
+                >
+                <Button type="primary" htmlType="submit">提交</Button>
+                </FormItem>               
+                </Form>
+              </Modal>
             </div>
         )
     }
 }
-export default Checkin;
+
+const WrappedCheckin = Form.create()(Checkin);
+
+export default WrappedCheckin;
