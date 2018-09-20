@@ -12,7 +12,7 @@ const Main=()=>(
       <Switch>
         <Route exact path='/' component={App}/>
         <Route path='/admin' component={Admin}/>
-        <Route path='/volunteer' component={Volunteer}/>
+        <Route path='/volunteer' component={Volunteer}/> 
       </Switch>
     </main>
 )

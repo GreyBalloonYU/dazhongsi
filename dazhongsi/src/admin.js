@@ -6,6 +6,8 @@ import {Switch,Route,Redirect}from 'react-router-dom';
 import axios from "axios";
 import Checkin from './checkin.js';
 import Arrange from './arrange.js';
+import DeleteCheckIn from './deleteCheckIn.js'
+import DeleteSchedule from './deleteSchedule.js'
 const { Header, Content, Footer } = Layout;
 var user={accountId:"",address:"",age:"",gender:"",id:"",idNumber:"",name:"",note:"",tel:""};
 
@@ -105,7 +107,11 @@ class Admin extends React.Component{
                      <Route exact path='/admin/checkin' render={(props)=>(
                       <Checkin {...props} user={user}/> 
                      )}/>
-                     <Route exact path="/admin/arrange" component={Arrange}/>
+                     <Route exact path='/admin/arrange' render={(props)=>(
+                      <Arrange {...props} changeDelete={this.changeDelete}/> 
+                     )}/>
+                     <Route path="/admin/deleteCheckIn" component={DeleteCheckIn}/> 
+                     <Route path="/admin/deleteSchedule" component={DeleteSchedule}/>                
                    </Switch>
                 </Content>
             </Layout>

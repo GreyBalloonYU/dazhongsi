@@ -308,7 +308,7 @@ class ManageSchedule extends React.Component{
      super(props);
      this.state={
        visible:false,
-       listRow:[],//存有所有志愿者在最近两个月之内排班的数据(之前一个月加未来一个月)
+       listRow:[],//存有所有志愿者在最近两个月之内排班的数据(之前一个月加未来一个月) 
      }
   }
 
@@ -413,8 +413,13 @@ class ManageSchedule extends React.Component{
                 key={item.title}
                 extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                 actions={[
-                  <span>{item.checkin=="已签到"?<span style={{marginLeft:"1em",marginRight:"1em"}}><Link to={"/deleteCheckIn"+item.scheduleId}>删除签到记录</Link></span>:<span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
-                  <Link to="/deleteSchedule">删除排班</Link>
+                  <span>{item.checkin=="已签到"?
+                  <span style={{marginLeft:"1em",marginRight:"1em"}}>
+                  <Link to={"/admin/deleteCheckIn?scheduleId="+item.scheduleId+"&name="+item.name}>删除签到记录</Link>
+                  </span>
+                  :
+                  <span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
+                  <Link to={"/admin/deleteSchedule?scheduleId="+item.scheduleId}>删除排班</Link>
                 ]}
                 >
               <span style={{fontSize:"1.5em"}}>
@@ -451,8 +456,13 @@ class ManageSchedule extends React.Component{
                 key={item.title}
                 extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                 actions={[
-                  <span>{item.checkin=="已签到"?<span style={{marginLeft:"1em",marginRight:"1em"}}><Link to={"/deleteCheckIn"+item.scheduleId}>删除签到记录</Link></span>:<span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
-                  <Link to="/deleteSchedule">删除排班</Link>
+                  <span>{item.checkin=="已签到"?
+                  <span style={{marginLeft:"1em",marginRight:"1em"}}>
+                  <Link to={"/admin/deleteCheckIn?scheduleId="+item.scheduleId+"&name="+item.name}>删除签到记录</Link>
+                  </span>
+                  :
+                  <span style={{marginLeft:"1em",marginRight:"1em"}}/>}</span>,
+                  <Link to={"/admin/deleteSchedule?scheduleId="+item.scheduleId}>删除排班</Link>
                 ]}
                 >
               <span style={{fontSize:"1.5em"}}>
