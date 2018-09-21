@@ -519,7 +519,7 @@ class Arrange extends React.Component{
             <div>
                <InquireSelfCheckIn isAction={this.state.isAction} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
                <br/><br/>
-               <ManageSchedule isAction={this.state.isAddSchedule} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
+               <ManageSchedule isAction={this.state.isAction} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
                <br/><br/><br/>
                <WrappedAddSchedule handleAction={this.handleAction}/>
                <br/><br/><br/>            

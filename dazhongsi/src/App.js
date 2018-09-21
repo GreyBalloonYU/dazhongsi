@@ -88,7 +88,6 @@ class Login extends React.Component{
         },
       },
     };
-    //return <Redirect exact push to="/center/checkin"/>
     if(this.state.redirect){
       if(localStorage.getItem("role")==="管理员")return <Redirect exact push to="/admin/checkin"/>
       else return <Redirect exact push to="/volunteer"/>
@@ -405,7 +404,7 @@ const WrappedLogin=Form.create()(Login);
 class App extends Component {
   render() {
     return (
-     <div>
+     <div style={{backgroundColor:"#CCF5FF"}}>
        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <Row>
        <Col xs={24} sm={{span:12,offset:8}}>
@@ -423,6 +422,7 @@ class App extends Component {
           <WrappedRegister/>
         </Col>
        </Row>
+       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
      </div>
     );
   }

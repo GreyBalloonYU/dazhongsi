@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import {Layout,Menu,message} from 'antd';
+import {Layout,Menu,message,Col,Button} from 'antd';
 import {Switch,Route,Redirect}from 'react-router-dom';
 import axios from "axios";
 import WrappedCheckin from './checkin.js';
@@ -19,6 +19,7 @@ class Admin extends React.Component{
             norepeatkey1:true,
             norepeatkey2:true,
             clickmenu:true,//确保是在点击侧边菜单的操作
+            isquit:false,//是否登出
         }
     }
 
@@ -71,12 +72,45 @@ class Admin extends React.Component{
         this.setState({key:key,clickmenu:true,});
     }
 
+    changeUserInformation=(values)=>{
+        this.setState({
+            address:values.地址,
+            age:values.年龄,
+            idNumber:values.身份证号,
+            name:values.姓名,
+            note:values.备注,
+            tel:values.电话,
+        });
+    }
+
+    quitUser=()=>{
+        var that=this;
+        var quituser=axios.create({
+            url:"http://39.107.99.27:8080/dazhong/account",
+            headers:{"content-type":"application/json"},
+            method:'delete',
+            timeout:1000,
+            withCredentials:true,
+        }) 
+        quituser().then(function(response){
+            message.success("退出成功",3);
+            that.setState({isquit:true});
+        })
+        .catch(function(error){
+            message.error("登出失败",3);
+            console.log(error);
+        })
+    }
+
     render(){
         if(this.state.key==1&&this.state.norepeatkey1&&this.state.clickmenu){
            return (<Redirect exact push to='/admin/checkin'/>);
         }
         if(this.state.key==2&&this.state.norepeatkey2&&this.state.clickmenu){
            return (<Redirect exact push to='/admin/arrange'/>);
+        }
+        if(this.state.isquit){
+           return (<Redirect exact push to='/'/>);
         }
         user.accountId=this.state.accountId;
         user.address=this.state.address;
@@ -105,14 +139,17 @@ class Admin extends React.Component{
                 <Content style={{ padding: '0 3.125em', marginTop: 64 }}>
                    <Switch>
                      <Route exact path='/admin/checkin' render={(props)=>(
-                      <WrappedCheckin {...props} user={user}/> 
+                      <WrappedCheckin {...props} user={user} changeUserInformation={this.changeUserInformation}/> 
                      )}/>
-                     <Route exact path='/admin/arrange' render={(props)=>(
-                      <Arrange {...props} changeDelete={this.changeDelete}/> 
-                     )}/>
+                     <Route exact path='/admin/arrange' component={Arrange}/>
                      <Route path="/admin/deleteCheckIn" component={DeleteCheckIn}/> 
                      <Route path="/admin/deleteSchedule" component={DeleteSchedule}/>                
                    </Switch>
+                   <br/>
+                   <Col xs={24} sm={{span:1,offset:11}}>
+                   <Button onClick={this.quitUser} size="large" type="primary">登出</Button>
+                   </Col>
+                   <br/><br/>
                 </Content>
             </Layout>
         )

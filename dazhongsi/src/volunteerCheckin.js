@@ -51,117 +51,117 @@ class CheckInTag extends React.Component{
 }
 
 class ModifyPassword extends React.Component{
-  constructor(props){
-    super(props);
-    this.state={
-        visible:false,
+    constructor(props){
+      super(props);
+      this.state={
+          visible:false,
+      }
+    }  
+  
+    showModal=()=>{
+      this.setState({visible:true});
     }
-  }  
-
-  showModal=()=>{
-    this.setState({visible:true});
+  
+    handleCancel=()=>{
+      this.setState({visible:false});
+    }
+  
+    handleSubmit=(e)=>{
+      e.preventDefault();
+      var that=this;
+      this.props.form.validateFieldsAndScroll(['旧密码','新密码'],(err,values)=>{
+        if(!err){
+        var modifyPass=axios.create({
+          url:"http://39.107.99.27:8080/dazhong/user/password?userId="+this.props.userId+"&oldPassword="+values.旧密码+"&newPassword="+values.新密码,
+          headers:{"content-type":"application/json"},
+          method:'put',
+          timeout:1000,
+          withCredentials:true,
+         });
+         modifyPass().then(function(response){
+           if(response.data.result===1000){
+             message.success(response.data.resultDesp,3);
+           }
+           else if(response.data.result===4001) message.error(response.data.resultDesp,3);
+           that.setState({visible:false});  
+         })
+         .catch(function(error){
+           message.error("修改密码失败",3);
+           console.log(error);
+         })  
+        }    
+      })
   }
-
-  handleCancel=()=>{
-    this.setState({visible:false});
-  }
-
-  handleSubmit=(e)=>{
-    e.preventDefault();
-    var that=this;
-    this.props.form.validateFieldsAndScroll(['旧密码','新密码'],(err,values)=>{
-      if(!err){
-      var modifyPass=axios.create({
-        url:"http://39.107.99.27:8080/dazhong/user/password?userId="+this.props.userId+"&oldPassword="+values.旧密码+"&newPassword="+values.新密码,
-        headers:{"content-type":"application/json"},
-        method:'put',
-        timeout:1000,
-        withCredentials:true,
-       });
-       modifyPass().then(function(response){
-         if(response.data.result===1000){
-           message.success(response.data.resultDesp,3);
-         }
-         else if(response.data.result===4001) message.error(response.data.resultDesp,3);
-         that.setState({visible:false});  
-       })
-       .catch(function(error){
-         message.error("修改密码失败",3);
-         console.log(error);
-       })  
-      }    
-    })
-}
-
-  render(){
-    const { getFieldDecorator } = this.props.form;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-    const tailFormItemLayout = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0,
+  
+    render(){
+      const { getFieldDecorator } = this.props.form;
+      const formItemLayout = {
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 8 },
         },
-        sm: {
-          span: 16,
-          offset: 8,
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 16 },
         },
-      },
-    };
-    return(
-      <div>
-        <Button type="primary" onClick={this.showModal}>修改密码</Button>
-        <Modal
-               title="修改密码"
-               visible={this.state.visible}
-               footer={null}
-               onCancel={this.handleCancel}
-               destroyOnClose={true}
-               width={600}
-        >
-          <Form onSubmit={this.handleSubmit}>
-          <FormItem
-            {...formItemLayout}
-              label="旧密码"
+      };
+      const tailFormItemLayout = {
+        wrapperCol: {
+          xs: {
+            span: 24,
+            offset: 0,
+          },
+          sm: {
+            span: 16,
+            offset: 8,
+          },
+        },
+      };
+      return(
+        <div>
+          <Button type="primary" onClick={this.showModal}>修改密码</Button>
+          <Modal
+                 title="修改密码"
+                 visible={this.state.visible}
+                 footer={null}
+                 onCancel={this.handleCancel}
+                 destroyOnClose={true}
+                 width={600}
           >
-            {getFieldDecorator('旧密码', {
-            rules: [{required: true, message: '请输入原密码!',whitespace:true}]
-            })(
-                <Input type="password"/>
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-              label="新密码"
-          >
-            {getFieldDecorator('新密码', {
-            rules: [{required: true, message: '请输入新的密码!',whitespace:true}]
-            })(
-                <Input type="password"/>
-            )}
-          </FormItem>
-          <FormItem {...tailFormItemLayout}>
-            <Button type="primary" htmlType="submit">确认</Button>
-          </FormItem>
-          </Form>        
-        </Modal>
-      </div>
-    )
+            <Form onSubmit={this.handleSubmit}>
+            <FormItem
+              {...formItemLayout}
+                label="旧密码"
+            >
+              {getFieldDecorator('旧密码', {
+              rules: [{required: true, message: '请输入原密码!',whitespace:true}]
+              })(
+                  <Input type="password"/>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+                label="新密码"
+            >
+              {getFieldDecorator('新密码', {
+              rules: [{required: true, message: '请输入新的密码!',whitespace:true}]
+              })(
+                  <Input type="password"/>
+              )}
+            </FormItem>
+            <FormItem {...tailFormItemLayout}>
+              <Button type="primary" htmlType="submit">确认</Button>
+            </FormItem>
+            </Form>        
+          </Modal>
+        </div>
+      )
+    }
   }
-}
+  
+  const WrappedModifyPassword = Form.create()(ModifyPassword);
 
-const WrappedModifyPassword = Form.create()(ModifyPassword);
-
-class Checkin extends React.Component{
+  class VolunteerCheckin extends React.Component{
     constructor(props){
         super(props);
         this.state={
@@ -179,10 +179,10 @@ class Checkin extends React.Component{
     }
 
     checkidNumber = (rule, value, callback) => {
-      if (value && !reg.test(value)) {
-        callback('身份证输入不合法!');
-      }
-      callback();
+        if (value && !reg.test(value)) {
+          callback('身份证输入不合法!');
+        }
+        callback();
     }
 
     componentDidMount(){
@@ -457,6 +457,6 @@ class Checkin extends React.Component{
     }
 }
 
-const WrappedCheckin = Form.create()(Checkin);
+const WrappedVolunteerCheckin = Form.create()(VolunteerCheckin);
 
-export default WrappedCheckin;
+export default WrappedVolunteerCheckin;
