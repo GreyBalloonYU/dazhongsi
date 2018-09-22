@@ -260,7 +260,7 @@ class InquireSelfCheckIn extends React.Component{
                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                   >
                   <span style={{fontSize:"1.5em"}}>
-                  {item.content}
+                  {item.content+" -- "+moment(item.content).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}
                   </span>
                   </List.Item>                
                 )}
@@ -292,7 +292,7 @@ class InquireSelfCheckIn extends React.Component{
                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                   >
                   <span style={{fontSize:"1.5em"}}>
-                  {item.content}
+                  {item.content+" -- "+moment(item.content).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}
                   </span>
                   </List.Item>                
                 )}
@@ -431,7 +431,7 @@ class ManageSchedule extends React.Component{
                 ]}
                 >
               <span style={{fontSize:"1.5em"}}>
-              <span style={{marginRight:"1em"}}>{item.time}</span>
+              <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
               {item["name"]}
               </span>
                </List.Item>
@@ -485,7 +485,7 @@ class ManageSchedule extends React.Component{
                 ]}
                 >
               <span style={{fontSize:"1.5em"}}>
-              <span style={{marginRight:"1em"}}>{item.time}</span>
+              <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
               {item["name"]}
               </span>
                </List.Item>
@@ -493,6 +493,104 @@ class ManageSchedule extends React.Component{
               size="large"
             />
         </Modal> 
+      </div>
+    )
+  }
+}
+
+class AccurateSearch extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={
+      visible:false,
+      dataRow:[],//某一天的排班表数据
+    }
+  }
+
+  showModal=()=>{
+    this.setState({visible:true});
+  }
+
+  handleCancel=()=>{
+    this.setState({visible:false,dataRow:[]});
+  }
+
+  onChange=(date,dateString)=>{
+    var that=this;
+    var getSchedule=axios.create({
+        url:"http://39.107.99.27:8080/dazhong/schedule?start="+moment(dateString).valueOf()+"&end="+moment(dateString).add(1,"days").subtract(1,"seconds").valueOf(),
+        headers:{"content-type":"application/json"},
+        method:'get',
+        timeout:1000,
+        withCredentials:true,
+    })
+    getSchedule().then(function(response){
+        var dataRow2=[];
+        for(var i=0;i<response.data.content.length;i++){
+            for(var j=0;j<response.data.content.length-i-1;j++){
+                if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                    var temp=response.data.content[j];
+                    response.data.content[j]=response.data.content[j+1];
+                    response.data.content[j+1]=temp;
+                }
+            }
+        }
+        for(var i=0;i<response.data.content.length;i++){
+            dataRow2.push(
+                {
+                 checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
+                 time:response.data.content[i].scheduleTime,
+                 name:response.data.content[i].name,
+                 scheduleId:response.data.content[i]["id"],
+                }
+            )
+        }
+        that.setState({dataRow:dataRow2});
+    })
+    .catch(function(error){
+        console.log(error);
+    })   
+  }
+
+  render(){
+    return(
+      <div>
+          <Col xs={24} sm={{span:12,offset:6}}>
+            <Button type="primary" onClick={this.showModal}>精确查找某一天的排班表</Button>
+          </Col>
+          <Modal
+            title="精确查找某一天的排班表"
+            visible={this.state.visible}
+            footer={null}
+            maskClosable={false}
+            onCancel={this.handleCancel}
+            destroyOnClose={true}
+            width={900}
+          > 
+          <Row>
+            <Col xs={24} sm={8}>
+              <DatePicker onChange={this.onChange}/>
+            </Col>
+          </Row>
+          <br/><br/>
+          <List
+              bordered
+              itemLayout="vertical"
+              dataSource={this.state.dataRow}
+              renderItem={item => (
+                <List.Item
+                key={item.title}
+                extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                >
+              <span style={{fontSize:"1.5em"}}>
+              <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
+              {item["name"]}
+              </span>
+               </List.Item>
+              )}
+              size="large"
+            />         
+          </Modal>
       </div>
     )
   }
@@ -520,6 +618,8 @@ class Arrange extends React.Component{
                <InquireSelfCheckIn isAction={this.state.isAction} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
                <br/><br/>
                <ManageSchedule isAction={this.state.isAction} handleAction={this.handleAction} handleEndAction={this.handleEndAction}/>
+               <br/><br/><br/>
+               <AccurateSearch/>
                <br/><br/><br/>
                <WrappedAddSchedule handleAction={this.handleAction}/>
                <br/><br/><br/>            

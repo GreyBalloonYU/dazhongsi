@@ -141,7 +141,7 @@ class Volunteer extends React.Component{
                      )}/>
                      <Route exact path='/volunteer/arrange' component={VolunteerArrange}/>             
                    </Switch>
-                   <br/>
+                   <br/><br/><br/>
                    <Col xs={24} sm={{span:1,offset:11}}>
                    <Button onClick={this.quitUser} size="large" type="primary">登出</Button>
                    </Col>

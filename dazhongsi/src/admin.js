@@ -145,7 +145,7 @@ class Admin extends React.Component{
                      <Route path="/admin/deleteCheckIn" component={DeleteCheckIn}/> 
                      <Route path="/admin/deleteSchedule" component={DeleteSchedule}/>                
                    </Switch>
-                   <br/>
+                   <br/><br/><br/>
                    <Col xs={24} sm={{span:1,offset:11}}>
                    <Button onClick={this.quitUser} size="large" type="primary">登出</Button>
                    </Col>

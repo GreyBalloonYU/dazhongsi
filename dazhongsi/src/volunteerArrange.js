@@ -73,7 +73,7 @@ class InquireSelfCheckIn extends React.Component{
                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                   >
                   <span style={{fontSize:"1.5em"}}>
-                  {item.content}
+                  {item.content+" -- "+moment(item.content).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}
                   </span>
                   </List.Item>                
                 )}
@@ -105,7 +105,7 @@ class InquireSelfCheckIn extends React.Component{
                    extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                   >
                   <span style={{fontSize:"1.5em"}}>
-                  {item.content}
+                  {item.content+" -- "+moment(item.content).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}
                   </span>
                   </List.Item>                
                 )}

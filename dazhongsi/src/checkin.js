@@ -41,7 +41,7 @@ class CheckInTag extends React.Component{
         return(
             <div>
              <span style={{ marginLeft:"1.25em",marginRight:"1.25em",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-             {this.props.text}
+             {this.props.text+" -- "+this.props.nextText}
              </span>
              <Tag color={this.state.color} style={{marginRight:"1.25em"}}>{this.state.content}</Tag>
              <Button onClick={this.handleCheckin} disabled={this.state.content=="未签到"?false:true}>签到</Button>
@@ -207,7 +207,12 @@ class Checkin extends React.Component{
             }
             for(var i=0;i<response.data.content.length;i++){
                 checkInRow2.push(
-                    <CheckInTag key={i} text={response.data.content[i].scheduleTime} isCheckIn={response.data.content[i].isCheckIn} scheduleId={response.data.content[i]["id"]}/>
+                    <CheckInTag key={i} 
+                    text={response.data.content[i].scheduleTime} 
+                    nextText={moment(response.data.content[i].scheduleTime).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}
+                    isCheckIn={response.data.content[i].isCheckIn} 
+                    scheduleId={response.data.content[i]["id"]}
+                    />
                 )
             }
             that.setState({checkInRow:checkInRow2});
