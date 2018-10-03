@@ -40,126 +40,17 @@ class CheckInTag extends React.Component{
     render(){
         return(
             <div>
-             <span style={{ marginLeft:"1.25em",marginRight:"1.25em",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
+             <span className="checkInBorder" style={{ marginLeft:"1.25em",marginRight:"1.25em",borderStyle:"solid",borderWidth:"thin",borderColor:"#AAAAAA"}}>
              {this.props.text+" -- "+this.props.nextText}
              </span>
+             <span className="checkInTag">
              <Tag color={this.state.color} style={{marginRight:"1.25em"}}>{this.state.content}</Tag>
              <Button onClick={this.handleCheckin} disabled={this.state.content=="未签到"?false:true}>签到</Button>
+             </span>
             </div>
         )
     }
 }
-
-class ModifyPassword extends React.Component{
-    constructor(props){
-      super(props);
-      this.state={
-          visible:false,
-      }
-    }  
-  
-    showModal=()=>{
-      this.setState({visible:true});
-    }
-  
-    handleCancel=()=>{
-      this.setState({visible:false});
-    }
-  
-    handleSubmit=(e)=>{
-      e.preventDefault();
-      var that=this;
-      this.props.form.validateFieldsAndScroll(['旧密码','新密码'],(err,values)=>{
-        if(!err){
-        var modifyPass=axios.create({
-          url:"http://39.107.99.27:8080/dazhong/user/password?userId="+this.props.userId+"&oldPassword="+values.旧密码+"&newPassword="+values.新密码,
-          headers:{"content-type":"application/json"},
-          method:'put',
-          timeout:1000,
-          withCredentials:true,
-         });
-         modifyPass().then(function(response){
-           if(response.data.result===1000){
-             message.success(response.data.resultDesp,3);
-           }
-           else if(response.data.result===4001) message.error(response.data.resultDesp,3);
-           that.setState({visible:false});  
-         })
-         .catch(function(error){
-           message.error("修改密码失败",3);
-           console.log(error);
-         })  
-        }    
-      })
-  }
-  
-    render(){
-      const { getFieldDecorator } = this.props.form;
-      const formItemLayout = {
-        labelCol: {
-          xs: { span: 24 },
-          sm: { span: 8 },
-        },
-        wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 16 },
-        },
-      };
-      const tailFormItemLayout = {
-        wrapperCol: {
-          xs: {
-            span: 24,
-            offset: 0,
-          },
-          sm: {
-            span: 16,
-            offset: 8,
-          },
-        },
-      };
-      return(
-        <div>
-          <Button type="primary" onClick={this.showModal}>修改密码</Button>
-          <Modal
-                 title="修改密码"
-                 visible={this.state.visible}
-                 footer={null}
-                 onCancel={this.handleCancel}
-                 destroyOnClose={true}
-                 width={600}
-          >
-            <Form onSubmit={this.handleSubmit}>
-            <FormItem
-              {...formItemLayout}
-                label="旧密码"
-            >
-              {getFieldDecorator('旧密码', {
-              rules: [{required: true, message: '请输入原密码!',whitespace:true}]
-              })(
-                  <Input type="password"/>
-              )}
-            </FormItem>
-            <FormItem
-              {...formItemLayout}
-                label="新密码"
-            >
-              {getFieldDecorator('新密码', {
-              rules: [{required: true, message: '请输入新的密码!',whitespace:true}]
-              })(
-                  <Input type="password"/>
-              )}
-            </FormItem>
-            <FormItem {...tailFormItemLayout}>
-              <Button type="primary" htmlType="submit">确认</Button>
-            </FormItem>
-            </Form>        
-          </Modal>
-        </div>
-      )
-    }
-  }
-  
-  const WrappedModifyPassword = Form.create()(ModifyPassword);
 
   class VolunteerCheckin extends React.Component{
     constructor(props){
@@ -168,21 +59,6 @@ class ModifyPassword extends React.Component{
             checkInRow:[],//存有今日签到的数组列表，每一个元素均为CheckInTag
             visible:false,
         }
-    }
-
-    showModal=()=>{
-        this.setState({visible:true});
-    }
-
-    handleCancel=()=>{
-        this.setState({visible:false});
-    }
-
-    checkidNumber = (rule, value, callback) => {
-        if (value && !reg.test(value)) {
-          callback('身份证输入不合法!');
-        }
-        callback();
     }
 
     componentDidMount(){
@@ -222,71 +98,7 @@ class ModifyPassword extends React.Component{
         })
     }
 
-    handleSubmit=(e)=>{
-      e.preventDefault();
-      var that=this;
-      this.props.form.validateFieldsAndScroll(['姓名','年龄','身份证号','电话','地址','备注'],(err,values)=>{
-        if(!err){
-        var modifyUser=axios.create({
-          url:"http://39.107.99.27:8080/dazhong/user",
-          headers:{"content-type":"application/json"},
-          method:'put',
-          data:{
-            userId:that.props.user["id"],
-            name:values.姓名,
-            gender:that.props.user.gender,
-            age:values.年龄,
-            idNumber:values.身份证号,
-            tel:values.电话,
-            address:values.地址,
-            note:values.备注
-          },
-          timeout:1000,
-          withCredentials:true,
-         });
-         modifyUser().then(function(response){
-           if(response.data.result===1000){
-             message.success(response.data.resultDesp,3);
-             that.props.changeUserInformation(values);
-           }
-           else if(response.data.result===4005) message.error(response.data.resultDesp,3);
-         })
-         .catch(function(error){
-           message.error("修改信息失败",3);
-           console.log(error);
-         }) 
-         this.setState({visible:false});       
-        }
-      })
-  }
-
     render(){
-        const { getFieldDecorator } = this.props.form;
-        const formItemLayout = {
-          labelCol: {
-            xs: { span: 24 },
-            sm: { span: 8 },
-          },
-          wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 16 },
-          },
-        };
-        const tailFormItemLayout = {
-          wrapperCol: {
-            xs: {
-              span: 24,
-              offset: 0,
-            },
-            sm: {
-              span: 16,
-              offset: 8,
-            },
-          },
-        };
-        const tips=(
-            <p style={{fontSize:"20px"}}>在原先的信息上修改</p>
-        )
         return(
             <div>
               <Row>
@@ -300,9 +112,9 @@ class ModifyPassword extends React.Component{
                 </Col>
                 <Col xs={24} sm={6}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   身份证号
+                   小组
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   {this.props.user.idNumber!==""?this.props.user.idNumber:"null"}
+                   {this.props.user.group!==""?this.props.user.group:"null"}
                    </span>
                    </div>
                 </Col>
@@ -310,33 +122,27 @@ class ModifyPassword extends React.Component{
               <Row>
                 <Col xs={24} sm={{span:6,offset:6}}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   年龄
+                   学校
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   {this.props.user.age!==""?this.props.user.age:"null"}
+                   {this.props.user.school!==""?this.props.user.school:"null"}
                    </span>
                    </div>
                 </Col>
                 <Col xs={24} sm={6}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   电话
+                   岗位
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   {this.props.user.tel!==""?this.props.user.tel:"null"}
+                   {this.props.user.post!==""?this.props.user.post:"null"}
                    </span>
                    </div>
-                </Col>
-                <Col xs={24} sm={2}>
-                  <Button type="primary" onClick={this.showModal}>修改用户信息</Button>
-                </Col>
-                <Col xs={24} sm={{span:2,offset:1}}>
-                  <WrappedModifyPassword userId={this.props.user.accountId}/>
                 </Col>
               </Row>
               <Row>
                 <Col xs={24} sm={{span:6,offset:6}}>
                    <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
-                   地址
+                   电话
                    <span style={{ marginLeft:"20px",borderStyle:"solid",borderWidth:"thin",paddingLeft:30,paddingRight:30,borderColor:"#AAAAAA"}}>
-                   {this.props.user.address!==""?this.props.user.address:"null"}
+                   {this.props.user.tel!==""?this.props.user.tel:"null"}
                    </span>
                    </div>
                 </Col>
@@ -360,108 +166,15 @@ class ModifyPassword extends React.Component{
               </Row>
               <Row>
                 <Col xs={24} sm={{span:12,offset:6}}>
-                   <div style={{fontSize:"16px",marginTop:"30px",position:"relative"}}>
+                   <div className="checkIn">
                    {_.first(this.state.checkInRow)}
                    </div>
                 </Col>
               </Row>
               <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-              <Modal
-               title="修改用户信息"
-               visible={this.state.visible}
-               footer={null}
-               onCancel={this.handleCancel}
-               destroyOnClose={true}
-               width={600}
-              >
-                <Form onSubmit={this.handleSubmit}>
-                <FormItem
-                  {...formItemLayout}
-                   label="姓名"
-                >
-                 {getFieldDecorator('姓名', {
-                  rules: [{
-                    required: true, message: '请输入姓名!',whitespace:true
-                  }],initialValue:this.props.user["name"]}
-                  )(
-                     <Input />
-                 )}
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                   label="年龄"
-                >
-                 {getFieldDecorator('年龄', {
-                   rules: [{
-                     whitespace:true,type:"number"
-                   }],initialValue:this.props.user.age}
-                   )(
-                    <InputNumber min={1} max={99}/>
-                 )}
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                   label="身份证号"
-                >
-                 {getFieldDecorator('身份证号', {
-                  rules: [{
-                    whitespace:true
-                  }, {
-                    validator: this.checkidNumber,
-                  }],initialValue:this.props.user.idNumber}
-                  )(
-                     <Input />
-                 )}
-                </FormItem>  
-                <FormItem
-                  {...formItemLayout}
-                   label="电话"
-                >
-                 {getFieldDecorator('电话', {
-                  rules: [{
-                    whitespace:true
-                  }],initialValue:this.props.user.tel}
-                  )(
-                     <Input />
-                 )}
-                </FormItem>  
-                <FormItem
-                  {...formItemLayout}
-                   label="地址"
-                >
-                 {getFieldDecorator('地址', {
-                  rules: [{
-                    whitespace:true
-                  }],initialValue:this.props.user.address
-                  })(
-                     <Input />
-                 )}
-                </FormItem> 
-                <FormItem
-                  {...formItemLayout}
-                   label="备注"
-                >
-                 {getFieldDecorator('备注', {
-                  rules: [{
-                    whitespace:true
-                  }],initialValue:this.props.user.note
-                  })(
-                     <Input />
-                 )}
-                </FormItem>
-                <FormItem
-                 {...tailFormItemLayout}
-                 help={tips}
-                >
-                <Button type="primary" htmlType="submit">提交</Button>
-                </FormItem>               
-                </Form>
-              </Modal>
             </div>
         )
     }
 }
 
-const WrappedVolunteerCheckin = Form.create()(VolunteerCheckin);
-
-export default WrappedVolunteerCheckin;
+export default VolunteerCheckin;

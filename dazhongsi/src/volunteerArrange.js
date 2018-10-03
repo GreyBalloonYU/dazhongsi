@@ -122,7 +122,7 @@ class VolunteerArrange extends React.Component{
           return(
               <div>
                  <InquireSelfCheckIn/>
-                 <br/><br/>   
+                 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>      
               </div>
           )
       }

@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import './App.css';
-import {Row,Col,Button,Modal,Form,Radio,Input,InputNumber,message} from 'antd';
+import {Row,Col,Button,Modal,Form,Radio,Input,message,List,Select,Tag} from 'antd';
 import {Redirect}from 'react-router-dom';
 import axios from 'axios';
+import moment from 'moment';
+import {_} from 'underscore';
+
+const Option = Select.Option;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
-var User={username:'',password:'',name:'',gender:'',age:0,idNumber:'',tel:'',address:'',note:''};
+var User={username:'',password:'',name:'',gender:'',school:'',group:'',tel:'',post:'',note:''};
 var enrollUser=axios.create({
   url:"http://39.107.99.27:8080/dazhong/account",
   headers:{"content-type":"application/json"},
@@ -48,6 +52,7 @@ class Login extends React.Component{
         loginUser().then(function(response){
           if(response.data.result===1000){
             localStorage.setItem("name",response.data.content["name"]);
+            localStorage.setItem("userId",response.data.content["id"]);
             localStorage.setItem("role",response.data.content["role"]);
             that.setState({visible:false,redirect:true});
             message.success(response.data.resultDesp,3);
@@ -94,7 +99,7 @@ class Login extends React.Component{
     }
     return(
        <div>
-          <Button type="primary" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>登录</Button>
+          <Button type="primary" className="login" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>登录</Button>
           <Modal 
           title="用户登录"
           visible={this.state.visible}
@@ -187,22 +192,13 @@ class Register extends React.Component{
         User.username=values.用户名;
         User.gender=values.性别;
         User.password=values.密码;
-        User.age=values.年龄;
-        User.idNumber=values.身份证号;
         User.tel=values.电话;
-        User.address=values.地址;
+        User.school=values.学校;
+        User.group=values.小组;
+        User.post=values.岗位;
         User.note=values.备注;
-        if(typeof(User.age)=="undefined"||User.age===0){
-          delete User.age;
-        }
-        if(typeof(User.idNumber)=="undefined"||User.idNumber==''){
-          delete User.idNumber;
-        }
-        if(typeof(User.tel)=="undefined"||User.tel==''){
-          delete User.tel;
-        }
-        if(typeof(User.address)=="undefined"||User.address==''){
-          delete User.address;
+        if(typeof(User.group)=="undefined"||User.group==''){
+          delete User.group;
         }
         if(typeof(User.note)=="undefined"||User.note==''){
           delete User.note;
@@ -251,7 +247,7 @@ class Register extends React.Component{
     };
     return(
       <div>
-      <Button type="primary" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>注册</Button>
+      <Button type="primary" className="register" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>注册</Button>
        <Modal
           title="用户注册"
           visible={this.state.visible}
@@ -329,25 +325,23 @@ class Register extends React.Component{
             </FormItem>
             <FormItem
              {...formItemLayout}
-             label="年龄"
+             label="学校"
             >
-            {getFieldDecorator('年龄', {
+            {getFieldDecorator('学校', {
             rules: [{
-              whitespace:true,type:"number"
+              required: true, message: '请填写你的学校!',whitespace:true
             }],
             })(
-            <InputNumber min={1} max={99}/>
+            <Input />
             )}
             </FormItem>
             <FormItem
              {...formItemLayout}
-             label="身份证号"
+             label="小组"
             >
-            {getFieldDecorator('身份证号', {
+            {getFieldDecorator('小组', {
             rules: [{
               whitespace:true
-            }, {
-              validator: this.checkidNumber,
             }],
             })(
             <Input />
@@ -359,7 +353,7 @@ class Register extends React.Component{
             >
             {getFieldDecorator('电话', {
             rules: [{
-              whitespace:true
+              required: true, message: '请填写电话号码!',whitespace:true
             }],
             })(
             <Input />
@@ -367,14 +361,17 @@ class Register extends React.Component{
             </FormItem>
             <FormItem
              {...formItemLayout}
-             label="地址"
+             label="岗位"
             >
-            {getFieldDecorator('地址', {
+            {getFieldDecorator('岗位', {
             rules: [{
-              whitespace:true
+              required: true, message: '请选择你的岗位!',
             }],
             })(
-            <Input />
+                <RadioGroup >
+                <Radio value={"志愿讲解岗"}>志愿讲解岗</Radio>
+                <Radio value={"志愿科普岗"}>志愿科普岗</Radio>
+                </RadioGroup>
             )}
             </FormItem>
             <FormItem
@@ -401,6 +398,94 @@ class Register extends React.Component{
 const WrappedRegister = Form.create()(Register);
 const WrappedLogin=Form.create()(Login);
 
+class OneWeekSchedule extends Component{
+  constructor(props){
+    super(props);
+    this.state={
+      visible:false,
+      isSearch:false,
+      listRow:[],//存有所有志愿者在最近一周之内排班的数据(之前3天加未来4天) 
+    }
+  }
+
+  showModal=()=>{
+    this.setState({visible:true});
+    var that=this;
+    var getSchedule=axios.create({
+        url:"http://39.107.99.27:8080/dazhong/schedule?start="+moment().subtract(3,"days").valueOf()+"&end="+moment().add(4,"days").valueOf(),
+        headers:{"content-type":"application/json"},
+        method:'get',
+        timeout:1000,
+        withCredentials:true,
+    })
+     getSchedule().then(function(response){
+      var dataRow=[];//排班列表
+      for(var i=0;i<response.data.content.length;i++){
+          for(var j=0;j<response.data.content.length-i-1;j++){
+              if(moment(response.data.content[j].scheduleTime).isAfter(response.data.content[j+1].scheduleTime)){
+                  var temp=response.data.content[j];
+                  response.data.content[j]=response.data.content[j+1];
+                  response.data.content[j+1]=temp;
+              }
+          }
+      }
+      for(var i=0;i<response.data.content.length;i++){
+          dataRow.push(
+              {
+               checkin:response.data.content[i].isCheckIn?"已签到":"未签到",
+               time:response.data.content[i].scheduleTime,
+               name:response.data.content[i].name,
+               scheduleId:response.data.content[i]["id"],
+              }
+          )
+      }
+        that.setState({listRow:dataRow});      
+    })
+    .catch(function(error){
+      console.log(error);
+    })
+  }
+
+  handleCancel=()=>{
+    this.setState({visible:false});
+  }
+
+  render(){
+    return(
+      <div>
+        <Button size="large" onClick={this.showModal} className="oneweek">查看最近一周的排班表</Button>
+        <Modal
+         title="查看最近一周的排班表"
+         visible={this.state.visible}
+         footer={null}
+         maskClosable={false}
+         onCancel={this.handleCancel}
+         destroyOnClose={true}
+         width={900}
+        > 
+          <List
+              bordered
+              itemLayout="vertical"
+              dataSource={this.state.listRow}
+              renderItem={item => (
+                <List.Item
+                key={item.title}
+                extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
+                >
+              <span style={{fontSize:"1.5em"}}>
+              <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
+              {item["name"]}
+              </span>
+               </List.Item>
+              )}
+              size="large"
+            />
+        </Modal>
+      </div>
+    )
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -408,20 +493,24 @@ class App extends Component {
        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <Row>
        <Col xs={24} sm={{span:12,offset:8}}>
-       <span style={{fontSize:"3.5em"}}>
+       <span className="indextitle">
          大钟寺志愿者排班系统
        </span>
        </Col>
        </Row>
        <br/><br/><br/><br/>
        <Row gutter={16}>
-        <Col xs={24} sm={{span:2,offset:8}}>
+        <Col xs={{span:18,offset:6}} sm={{span:2,offset:8}}>
           <WrappedLogin/>
         </Col>
-        <Col xs={24} sm={{span:2,offset:3}}>
+        <Col xs={{span:18,offset:6}} sm={{span:2,offset:3}}>
           <WrappedRegister/>
         </Col>
        </Row>
+       <br/><br/><br/><br/>
+       <Col xs={24} sm={{span:1,offset:10}}>
+          <OneWeekSchedule/>
+       </Col>
        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
      </div>
     );

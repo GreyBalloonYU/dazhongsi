@@ -1,2 +1,75 @@
 @import '~antd/dist/antd.css';
 
+@media screen and (min-width:576px){
+    .dropDown{
+        margin-left: 1800%;
+    }
+    .dropDown2{
+        margin-left: 1700%;
+    }
+    .oneweek{
+        margin-left:35%;
+    }
+    .indextitle{
+        font-size:48px;
+    }
+    .login{
+        margin-left:25%;
+    }
+    .checkIn{
+        font-size:16px;
+        margin-top:30px;
+        position:relative;
+    }
+    .checkInBorder{
+        padding-left:20px;
+        padding-right:20px;
+    }
+}
+
+@media screen and (max-width:576px){
+    .dropDown{
+        margin-left: -10%;
+    }
+    .menu{
+        width:20%;
+    }
+    .label{
+        margin-left:-90%;
+    }
+    .label2{
+        margin-left:-130%;
+    }
+    .label3{
+        margin-left:-110%;
+    }
+    .indextitle{
+        font-size:35px;
+        margin-left: 3%;
+    }
+    .oneweek{
+        margin-left:25%;
+    }
+    .login{
+        margin-left:9%;
+        margin-bottom: 10%;
+    }
+    .register{
+        margin-left:9%;
+    }
+    .checkIn{
+        font-size:14px;
+        margin-top:30px;
+        position:relative;
+    }
+    .checkInTag{
+        margin-left: 25%;
+    }
+    .checkInBorder{
+        padding-left:3px;
+        padding-right:3px;
+    }
+    .back{
+        margin-left:30%;
+    }
+}

@@ -60,7 +60,7 @@ class DeleteCheckIn extends React.Component{
             <div>
             <br/><br/><br/><br/><br/><br/>
             <Col xs={24} sm={{span:1,offset:11}}>
-            <Button type="primary" onClick={this.handleRedirect} size="large">点击返回</Button>
+            <Button className="back" type="primary" onClick={this.handleRedirect} size="large">点击返回</Button>
             </Col>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
             <br/><br/><br/><br/><br/><br/>
