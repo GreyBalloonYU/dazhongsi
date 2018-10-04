@@ -441,7 +441,7 @@ class Volunteer extends React.Component{
                   >
                   <Menu.Item key="1" className="menu"><span className="label">我的</span></Menu.Item>
                   <Menu.Item key="2" className="menu"><span className="label2">排班表</span></Menu.Item>
-                  <Menu.Item key="3" className="menu" disabled={true}>
+                  <Menu.Item key="3" className="disabledmenu" disabled={true}>
                   <span className="dropDown">
                    <Dropdown overlay={menu} placement="bottomCenter">
                      <Button>{this.state["name"]}</Button>

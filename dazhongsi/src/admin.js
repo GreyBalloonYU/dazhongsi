@@ -350,8 +350,8 @@ class Admin extends React.Component{
                     style={{ lineHeight: '4.6em' }}
                     onClick={this.changehref}
                   >
-                  <Menu.Item className="menu" key="1"><span className="label3">排班表</span></Menu.Item>
-                  <Menu.Item className="menu" key="2" disabled={true}>
+                  <Menu.Item className="menu2" key="1"><span className="label3">排班表</span></Menu.Item>
+                  <Menu.Item className="disabledmenu" key="2" disabled={true}>
                   <span className="dropDown2">
                    <Dropdown overlay={menu} placement="bottomCenter">
                      <Button>{localStorage.getItem("name")}</Button>

@@ -385,7 +385,7 @@ class ManageSchedule extends React.Component{
                   <Link to={"/admin/deleteSchedule?scheduleId="+item.scheduleId}>删除排班</Link>
                 ]}
                 >
-              <span style={{fontSize:"1.5em"}}>
+              <span className="schedule2">
               <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
               {item["name"]}
               </span>
@@ -443,7 +443,7 @@ class ManageSchedule extends React.Component{
                   <Link to={"/admin/deleteSchedule?scheduleId="+item.scheduleId}>删除排班</Link>
                 ]}
                 >
-              <span style={{fontSize:"1.5em"}}>
+              <span className="schedule2">
               <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
               {item["name"]}
               </span>
@@ -508,6 +508,7 @@ class AccurateSearch extends React.Component{
     })
     .catch(function(error){
         console.log(error);
+        that.setState({dataRow:[]});
     })   
   }
 
@@ -541,7 +542,7 @@ class AccurateSearch extends React.Component{
                 key={item.title}
                 extra={item.checkin=="未签到"?<Tag color="red">未签到</Tag>:<Tag color="green">已签到</Tag>}
                 >
-              <span style={{fontSize:"1.5em"}}>
+              <span className="schedule2">
               <span style={{marginRight:"1em"}}>{item.time+" -- "+moment(item.time).add(2,"hours").add(30,"minutes").format("HH:mm:ss")}</span>
               {item["name"]}
               </span>
