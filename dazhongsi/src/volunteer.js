@@ -443,7 +443,7 @@ class Volunteer extends React.Component{
                   <Menu.Item key="2" className="menu"><span className="label2">排班表</span></Menu.Item>
                   <Menu.Item key="3" className="disabledmenu" disabled={true}>
                   <span className="dropDown">
-                   <Dropdown overlay={menu} placement="bottomCenter">
+                   <Dropdown overlay={menu} placement="bottomCenter" trigger={['click','hover']}>
                      <Button>{this.state["name"]}</Button>
                    </Dropdown>
                   </span>

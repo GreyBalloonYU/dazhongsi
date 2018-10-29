@@ -353,7 +353,7 @@ class Admin extends React.Component{
                   <Menu.Item className="menu2" key="1"><span className="label3">排班表</span></Menu.Item>
                   <Menu.Item className="disabledmenu" key="2" disabled={true}>
                   <span className="dropDown2">
-                   <Dropdown overlay={menu} placement="bottomCenter">
+                   <Dropdown overlay={menu} placement="bottomCenter" trigger={['click','hover']}>
                      <Button>{localStorage.getItem("name")}</Button>
                    </Dropdown>
                   </span>
