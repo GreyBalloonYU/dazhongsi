@@ -99,7 +99,9 @@ class Login extends React.Component{
     }
     return(
        <div>
-          <Button type="primary" className="login" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>登录</Button>
+          <div className="login">
+          <Button type="primary" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>登录</Button>
+          </div>
           <Modal 
           title="用户登录"
           visible={this.state.visible}
@@ -247,7 +249,9 @@ class Register extends React.Component{
     };
     return(
       <div>
-      <Button type="primary" className="register" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>注册</Button>
+      <div className="register">  
+      <Button type="primary" style={{width:"9.375em",height:"3.125em"}} onClick={this.showModal}>注册</Button>
+      </div>
        <Modal
           title="用户注册"
           visible={this.state.visible}
@@ -453,7 +457,9 @@ class OneWeekSchedule extends Component{
   render(){
     return(
       <div>
-        <Button size="large" onClick={this.showModal} className="oneweek">查看最近一周的排班表</Button>
+        <div className="oneweek">
+        <Button size="large" onClick={this.showModal}>查看最近一周的排班表</Button>
+        </div>
         <Modal
          title="查看最近一周的排班表"
          visible={this.state.visible}
@@ -493,17 +499,17 @@ class App extends Component {
        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <Row>
        <Col xs={24} sm={{span:12,offset:8}}>
-       <span className="indextitle">
+       <div className="indextitle">
          大钟寺志愿者排班系统
-       </span>
+       </div>
        </Col>
        </Row>
        <br/><br/><br/><br/>
        <Row gutter={16}>
-        <Col xs={{span:18,offset:6}} sm={{span:2,offset:8}}>
+        <Col xs={24} sm={{span:2,offset:8}}>
           <WrappedLogin/>
         </Col>
-        <Col xs={{span:18,offset:6}} sm={{span:2,offset:3}}>
+        <Col xs={24} sm={{span:2,offset:3}}>
           <WrappedRegister/>
         </Col>
        </Row>
