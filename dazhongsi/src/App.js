@@ -11,6 +11,7 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
 var User={username:'',password:'',name:'',gender:'',school:'',group:'',tel:'',post:'',note:''};
+var codeurl=""//图片验证码的url
 var enrollUser=axios.create({
   url:"http://39.107.99.27:8080/dazhong/account",
   headers:{"content-type":"application/json"},
@@ -19,6 +20,13 @@ var enrollUser=axios.create({
   timeout:1000,
   withCredentials:true,
 });
+//加时间戳
+function timestamp(url){  
+     //  var getTimestamp=Math.random();  
+     var getTimestamp=new Date().getTime();  
+     url=url+"?timestamp="+getTimestamp  
+     return url;  
+}  
 class Login extends React.Component{
   constructor(props){
     super(props);
@@ -149,7 +157,12 @@ class Register extends React.Component{
     }
   }
 
+  componentDidMount(){
+    codeurl=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+  }
+
   showModal=()=>{
+    codeurl=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
     this.setState({visible:true});
   }
 
@@ -205,20 +218,44 @@ class Register extends React.Component{
         if(typeof(User.note)=="undefined"||User.note==''){
           delete User.note;
         }
+        let urlss="http://39.107.99.27:8080/dazhong/account/imageCode?checkCode="+values.验证码;
+        var checkImageCode=axios.create({
+          url:urlss,
+          headers:{"content-type":"application/json"},
+          method:'post',
+          timeout:1000,
+          withCredentials:true,
+        });//检验验证码是否输入正确
         var that=this;
-        enrollUser().then(function(response){
-          if(response.data.result===1000){
-            that.setState({visible:false});
-            message.success(response.data.resultDesp,3);
-          }
-          else if(response.data.result===4002){
-            message.error(response.data.resultDesp,3);
-          }
+        checkImageCode().then(function(response1){
+          if(response1.data.result===1000){
+          enrollUser().then(function(response){
+            if(response.data.result===1000){
+              that.setState({visible:false});
+              message.success(response.data.resultDesp,3);
+            }
+            else if(response.data.result===4002){
+              message.error(response.data.resultDesp,3);
+            }
+          })
+          .catch(function(error){
+            message.error('用户创建失败!',3);
+            console.log(error);
+          });
+        }
+        else if(response1.data.result===4007){
+          message.error(response1.data.resultDesp,3);
+          codeurl=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+        }
+        else if(response1.data.result===4008){
+          message.error(response1.data.resultDesp,3);
+        }
         })
-        .catch(function(error){
-          message.error('用户创建失败!',3);
-          console.log(error);
-        });
+        .catch(function(error1){
+          console.log(error1);
+          message.error('验证码错误!',3);
+          codeurl=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+        })
       }
     });
   }
@@ -388,6 +425,21 @@ class Register extends React.Component{
             }],
             })(
             <Input />
+            )}
+            </FormItem>
+            <FormItem
+             {...formItemLayout}
+             label="验证码"
+            >
+            {getFieldDecorator('验证码', {
+            rules: [{
+              whitespace:true,required: true, message: '请输入验证码!',
+            }],
+            })(
+            <div>
+            <Input />
+            <img src={codeurl} alt="图片验证码" />  
+            </div>          
             )}
             </FormItem>
             <FormItem {...tailFormItemLayout}>
