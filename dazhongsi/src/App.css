@@ -12,6 +12,7 @@
     }
     .indextitle{
         font-size:48px;
+        text-align:center;
     }
     .login{
         margin-left:25%;
@@ -60,7 +61,7 @@
         text-align:center;
     }
     .indextitle{
-        font-size:32px;
+        font-size:28px;
         text-align:center;
     }
     .oneweek{

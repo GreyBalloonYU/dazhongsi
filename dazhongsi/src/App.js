@@ -11,7 +11,8 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
 var User={username:'',password:'',name:'',gender:'',school:'',group:'',tel:'',post:'',note:''};
-var codeurl=""//图片验证码的url
+var codeurl=""//注册对话框图片验证码的url
+var codeurl2=""//登录对话框图片验证码的url
 var enrollUser=axios.create({
   url:"http://39.107.99.27:8080/dazhong/account",
   headers:{"content-type":"application/json"},
@@ -36,7 +37,12 @@ class Login extends React.Component{
     }
   }
   
+  componentDidMount(){
+    codeurl2=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+  }
+
   showModal=()=>{
+    codeurl2=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
     this.setState({visible:true});
   }
 
@@ -56,23 +62,47 @@ class Login extends React.Component{
           timeout:1000,
           withCredentials:true,
         })
+        let urlss="http://39.107.99.27:8080/dazhong/account/imageCode?checkCode="+values.验证码;
+        var checkImageCode=axios.create({
+          url:urlss,
+          headers:{"content-type":"application/json"},
+          method:'post',
+          timeout:1000,
+          withCredentials:true,
+        });//检验验证码是否输入正确
         var that=this;
-        loginUser().then(function(response){
-          if(response.data.result===1000){
-            localStorage.setItem("name",response.data.content["name"]);
-            localStorage.setItem("userId",response.data.content["id"]);
-            localStorage.setItem("role",response.data.content["role"]);
-            that.setState({visible:false,redirect:true});
-            message.success(response.data.resultDesp,3);
+        checkImageCode().then(function(response1){
+          if(response1.data.result===1000){
+            loginUser().then(function(response){
+              if(response.data.result===1000){
+                localStorage.setItem("name",response.data.content["name"]);
+                localStorage.setItem("userId",response.data.content["id"]);
+                localStorage.setItem("role",response.data.content["role"]);
+                that.setState({visible:false,redirect:true});
+                message.success(response.data.resultDesp,3);
+              }
+              else if(response.data.result===4001){
+                message.error(response.data.resultDesp,3);
+              }
+            })
+            .catch(function(error){
+              message.error('登录失败!',3);
+              console.log(error);
+            });
           }
-          else if(response.data.result===4001){
-            message.error(response.data.resultDesp,3);
+          else if(response1.data.result===4007){
+            message.error(response1.data.resultDesp,3);
+            codeurl2=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+          }
+          else if(response1.data.result===4008){
+            message.error(response1.data.resultDesp,3);
           }
         })
-        .catch(function(error){
-          message.error('登录失败!',3);
-          console.log(error);
-        });
+        .catch(function(error1){
+          console.log(error1);
+          message.error('验证码错误!',3);
+          codeurl2=timestamp("http://39.107.99.27:8080/dazhong/account/imageCode");
+        })
       }
     });
   }
@@ -138,6 +168,21 @@ class Login extends React.Component{
               <Input type="password" />
              )}
           </FormItem>
+          <FormItem
+             {...formItemLayout}
+             label="验证码"
+            >
+            {getFieldDecorator('验证码', {
+            rules: [{
+              whitespace:true,required: true, message: '请输入验证码!',
+            }],
+            })(
+            <div>
+            <Input />
+            <img src={codeurl2} alt="图片验证码" />  
+            </div>          
+            )}
+            </FormItem>
           <FormItem {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit">确认</Button>
           </FormItem>
@@ -550,9 +595,9 @@ class App extends Component {
      <div style={{backgroundColor:"#CCF5FF"}}>
        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <Row>
-       <Col xs={24} sm={{span:12,offset:8}}>
+       <Col span={24}>
        <div className="indextitle">
-         大钟寺志愿者排班系统
+         大钟寺古钟博物馆志愿者排班系统
        </div>
        </Col>
        </Row>

@@ -189,7 +189,7 @@ class SearchVolunteerInformation extends React.Component{
             <div>
                <Button onClick={this.showModal} type="primary">查询志愿者信息</Button> 
                <Modal
-                  title="管理最近两个月的排班表"
+                  title="查看志愿者详细信息"
                   visible={this.state.visible}
                   footer={null}
                   maskClosable={false}
